@@ -1,0 +1,294 @@
+{
+  "name": "Monitoreo de carpeta de Google Drive con alertas automáticas",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        256,
+        96
+      ],
+      "id": "06034f8a-4447-4ae5-96f4-76c8494c51b4",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "UbQ3lyVLwjnZpwWp",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.mimeType }}",
+        "options": {
+          "systemMessage": "Cataloga el tipo,\n .pdf seria: archivo PDF\n .doc / .docx → Documento de Word \n .xls / .xlsx → Hoja de cálculo de Excel\n .ppt / .pptx → Presentación de PowerPoint \n .txt → Archivo de texto plano \n .jpg, .jpeg, .png, .gif, .bmp, .tiff, .svg → Imagen \n .zip, .rar, .7z, .tar, .gz → Archivo comprimido \n .mp3, .wav, .aac, .ogg, .flac → Audio \n .mp4, .avi, .mkv, .mov, .wmv → Video \n .csv → Archivo CSV \n .mdb, .accdb → Archivo de base de datos de Access\n .json → Archivo JSON \nArchivo XML"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        -80
+      ],
+      "id": "4b87dd29-ef18-49d8-b320-7d7e0c6f45f8",
+      "name": "Identificador de tipo de archivo"
+    },
+    {
+      "parameters": {
+        "chatId": "1659235853",
+        "text": "=¡Aviso! 📌\n\n{{ $('Extraer archivo').item.json.owners[0].displayName }} ha agregado un *{{ $json.output }}* en tu carpeta compartida desde el correo:\n{{ $('Extraer archivo').item.json.owners[0].emailAddress }}\n\n[Haz clic aquí para verlo 👀]({{ $('Extraer archivo').item.json.webViewLink }})\n```⚠️Alerta_de_seguridad\nNo abras el link si no estás seguro de su contenido.```",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        128
+      ],
+      "id": "cae26ea1-e6ab-45b3-8ad8-4b385e42e715",
+      "name": "Aviso por Telegram",
+      "webhookId": "263bdbc9-e0af-48ae-948e-729ea6b4b90e",
+      "credentials": {
+        "telegramApi": {
+          "id": "9GFIzmI2lh3OmUNm",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "davidcasallas1202@gmail.com",
+        "subject": "Nuevo archivo cargado en carpeta compartida",
+        "emailType": "text",
+        "message": "={{ $json.owners[0].displayName }} ha agregado un nuevo archivo en la carpeta de Drive.  \n\nEl archivo se encuentra adjunto; puedes verlo o descargarlo si lo deseas.  ",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        288,
+        432
+      ],
+      "id": "fb8951ea-0b20-433f-9725-a3362c8a10a9",
+      "name": "Aviso por Gmail",
+      "webhookId": "fdbc9c00-ee1f-444c-a51d-94e5ee1db441",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dx9bxFcZWM0deSN8",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Trigger\nEste nodo es el disparador del flujo. Monitorea una carpeta específica de Google y se activa cada vez que se agrega un archivo nuevo dentro de ella.",
+        "height": 384,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -368,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "0b5d4686-d7f5-4c4e-8113-718a7efbeb39",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Extraccion de archivo\nDescarga el archivo recién creado en Google Drive para poder  adjuntarlo con su información en los avisos",
+        "height": 384,
+        "width": 272,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -112,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "50bee7a1-2825-4ace-b20c-e62f1dbc023a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Identificador de tipo de archivo\nDetermina el tipo de archivo recién subido (PDF, Word, Excel, imagen, etc.)",
+        "height": 448,
+        "width": 384,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        176,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "720b16ad-86be-4797-83bf-9edbe7e2ccdd",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Mensaje de aviso por Telegram\nEnvía un mensaje de notificación a un chat de Telegram con los datos del archivo recién subido",
+        "height": 336,
+        "width": 224,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        608,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "c37f3961-71cd-4783-b7f3-746848fcf36d",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Mensaje de aviso por Gmail \nEnvía un correo electrónico notificando que se ha agregado un archivo nuevo a la carpeta de Google Drive.",
+        "height": 272,
+        "width": 336,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        208,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "b74087ed-470b-4c32-a3b1-b32229ac8324",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.webViewLink }}",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -32,
+        144
+      ],
+      "id": "a510d7bc-1b27-472d-a170-65ee59a759c6",
+      "name": "Extraer archivo",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "fz7Kyjw4STxKM8nL",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "14Jo5cdBV-vtCaZSUgEJ73LZvKUzJug1A",
+          "mode": "list",
+          "cachedResultName": "n8n prueba",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/14Jo5cdBV-vtCaZSUgEJ73LZvKUzJug1A"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        144
+      ],
+      "id": "d9ba7150-82e9-4235-93b2-1a8bcb0f5916",
+      "name": "Trigger Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "fz7Kyjw4STxKM8nL",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Identificador de tipo de archivo",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identificador de tipo de archivo": {
+      "main": [
+        [
+          {
+            "node": "Aviso por Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer archivo": {
+      "main": [
+        [
+          {
+            "node": "Identificador de tipo de archivo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Aviso por Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Drive": {
+      "main": [
+        [
+          {
+            "node": "Extraer archivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "98a59500-8350-49a9-a6ad-e36dd708f970",
+  "meta": {
+    "instanceId": "a4516eb1f0ee019b23472be5012b748070c770a4e604ad03a3cccb6d2ffa1925"
+  },
+  "id": "7hS0fuc5FCoCxbLJ",
+  "tags": []
+}
